@@ -1,6 +1,7 @@
 package com.dabin;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
@@ -29,9 +30,9 @@ public class TopWords {
 
     public String[] top100(String fileName) throws Exception {
 
-        // 1. 初始化一个 100 大小的小顶堆
+        // 1. 初始化一个 101 大小的小顶堆，因为在 57 行先添加数量会达到 100 如果数量为 100 会导致小顶堆进行一次 grow
         // 堆中每个节点存放的是单词及其出现的次数
-        PriorityQueue<Pair> minHeap = new PriorityQueue<>(100, Comparator.comparingInt(o -> o.cnt));
+        PriorityQueue<Pair> minHeap = new PriorityQueue<>(101, Comparator.comparingInt(o -> o.cnt));
 
 
         // 前一个单词
@@ -48,13 +49,14 @@ public class TopWords {
             // 那么需要处理前一个单词
             if (!currWord.equals(prevWord)) {
                 // 如果堆的大小小于 100，那么直接将前一个单词及其出现的次数放入堆中
+                Pair pair = new Pair(prevWord, prevCnt);
                 if (minHeap.size() < 100) {
-                    minHeap.add(new Pair(prevWord, prevCnt));
-                } else if (prevCnt > minHeap.peek().cnt) { // 否则，如果前一个单词出现的次数大于堆顶单词出现的次数
-                    // 先删除堆顶单词
-                    minHeap.remove();
-                    //将前一个单词及其出现的次数放入堆中
-                    minHeap.add(new Pair(prevWord, prevCnt));
+                    minHeap.add(pair);
+                } else {
+                    // 先添加
+                    minHeap.add(pair);
+                    // 再删除，这样小顶堆会自动将最小的元素移出
+                    minHeap.poll();
                 }
 
                 // 将当前单词设置为前一个单词
@@ -77,7 +79,8 @@ public class TopWords {
     }
 
     public static void main(String[] args) throws Exception {
-        String fileName = "data\\top100\\sorted_words.txt";
+        // 这个斜杠兼容 linux 以及 windows, 或者使用 File.separator
+        String fileName = "data/top100/sorted_words.txt";
         String[] res = new TopWords().top100(fileName);
         System.out.println(Arrays.toString(res));
     }
