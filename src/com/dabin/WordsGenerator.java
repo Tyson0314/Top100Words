@@ -12,7 +12,7 @@ import java.util.Random;
  *  数据写道当前工程目录下的文件：data\top100\words.txt
  */
 public class WordsGenerator {
-    private static Random r = new Random();
+    private static final Random r = new Random();
 
     public static void main(String[] args) throws IOException {
 
@@ -23,7 +23,8 @@ public class WordsGenerator {
 
         for (int i = 0; i < 400000; i++) {
             StringBuilder line = new StringBuilder();
-            for (int j = 0; j < 4 + r.nextInt(12); j++) {
+            int length = r.nextInt(16) + 1;
+            for (int j = 0; j < length; j++) {
                 line.append(chars[r.nextInt(m)]);
             }
             if (line.length() == 0) continue;
